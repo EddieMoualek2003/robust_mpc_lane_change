@@ -29,5 +29,9 @@ discrete_ss.plant_d = plant_d;
 ref = refPath(params);
 
 %% Run the Simulation Frameworks
-[Xlog_mpcmove, Ylog_mpcmove, Ulog_mpcmove, QPlog_mpcmove, Slacklog_mpcmove, Itlog_mpcmove, aylog_mpcmove] = mpcmoveMPCSimulation(xmpc, mpcobj, params, Ad,Bd,Cd,Dd,plant_d, ref);
-[y_sim, t_sim, u_sim, xp_sim, xc_sim] = simMPCSimulation(ref, params, mpcobj);
+[x_mpcmove, y_mpcmove, u_mpcmove, QPlog_mpcmove, Slacklog_mpcmove, Itlog_mpcmove, aylog_mpcmove, runTime_mpcmove] = mpcmoveMPCSimulation(xmpc, mpcobj, params, Ad,Bd,Cd,Dd,plant_d, ref);
+[y_sim, t_sim, u_sim, xp_sim, xc_sim, runTime_sim] = simMPCSimulation(ref, params, mpcobj);
+
+%% Prepare the data for analysis
+ref = ref(1:params.numSamples, :);
+y.mpcmove = y_mpcmove; y.simdata = y_sim;

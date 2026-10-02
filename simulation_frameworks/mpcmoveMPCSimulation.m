@@ -1,5 +1,6 @@
-function [Xlog, Ylog, Ulog, QPlog, Slacklog, Itlog, aylog] = mpcmoveMPCSimulation(xmpc, mpcobj, params, Ad,Bd,Cd,Dd,plant_d, ref)
+function [Xlog, Ylog, Ulog, QPlog, Slacklog, Itlog, aylog, runTime] = mpcmoveMPCSimulation(xmpc, mpcobj, params, Ad,Bd,Cd,Dd,plant_d, ref)
 
+    tLoop = tic;                              % NEW: total closed-loop run time
     c_vy = params.c_vy;
     c_w  = params.c_w;
     c_d  = params.c_d;
@@ -48,5 +49,5 @@ function [Xlog, Ylog, Ulog, QPlog, Slacklog, Itlog, aylog] = mpcmoveMPCSimulatio
 
     fprintf('QP failures: %d, max slack: %.3g, max iterations: %d\n', ...
         nnz(QPlog ~= "feasible"), max(Slacklog), max(Itlog));
-
+    runTime = toc(tLoop);                     % NEW
 end

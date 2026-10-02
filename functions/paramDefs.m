@@ -26,7 +26,7 @@ function params = paramDefs()
     params.Tstop = 50;
     params.numSamples = round(params.Tstop/params.Ts);
     params.samples = (1:params.numSamples);
-    params.t = params.samples*params.Ts;
+    params.t = (0:params.numSamples-1)' * params.Ts;
 
     % System Design Constraints
     params.Jlong = 2.0;
