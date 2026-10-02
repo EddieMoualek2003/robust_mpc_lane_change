@@ -35,3 +35,7 @@ ref = refPath(params);
 %% Prepare the data for analysis
 ref = ref(1:params.numSamples, :);
 y.mpcmove = y_mpcmove; y.simdata = y_sim;
+u.mpcmove = u_mpcmove; u.simdata = u_sim;
+
+% dataAnalysis(ref, y, u);
+finddelay(ref(:, 2), y_sim(:, 2))
