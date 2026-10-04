@@ -1,13 +1,10 @@
-function [Ad,Bd,Cd,Dd,plant_d] = plantConstruction(params, f_sym, g_sym, x_sym, u_sym, x0, u0)
+function [linearisedSystem,plant_d, params] = lineariseSystem(params, f_sym, g_sym, x_sym, u_sym, x0, u0)
+    
     %% Linearise the system and evaluate at the operating point
     Ac_sym = jacobian(f_sym, x_sym);
     Bc_sym = jacobian(f_sym, u_sym);
     Cc_sym = jacobian(g_sym, x_sym);
     Dc_sym = jacobian(g_sym, u_sym);
-
-    % Operating point definition
-    x0 = [0; 0; 0; params.vx0; 0; 0]; % Assume initially cruising at 15m/s.
-    u0 = [0; 0];
 
     % Substitute variables and convert symbolic objects to numeric doubles
     Ac = double(subs(Ac_sym, [x_sym; u_sym], [x0; u0]));
@@ -32,5 +29,11 @@ function [Ad,Bd,Cd,Dd,plant_d] = plantConstruction(params, f_sym, g_sym, x_sym, 
     plant_d.StateName = {'X Position'; 'Y Position'; 'Yaw Angle'; ...
                         'Longitudinal Velocity'; 'Lateral Velocity'; 'Yaw Rate'};
     plant_d.StateUnit = {'m'; 'm'; 'rad'; 'm/s'; 'm/s'; 'rad/s'};
-    [Ad,Bd,Cd,Dd] = ssdata(plant_d);            % must be the same Ts as mpcobj
+    [linearisedSystem.Ad,linearisedSystem.Bd,linearisedSystem.Cd,linearisedSystem.Dd] = ssdata(plant_d);            % must be the same Ts as mpcobj
+    
+    params.fNum = matlabFunction(f_sym, 'Vars',{x_sym, u_sym});
+    [params.xNomFun, ~] = computeNominal(params.fNum, params.x0, params.u0, params.t);
+
+    params.gNum = matlabFunction(g_sym, 'Vars',{x_sym, u_sym});
+    params.yNomFun = @(t) params.gNum(params.xNomFun(t), params.u0);
 end

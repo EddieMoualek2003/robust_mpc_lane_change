@@ -12,12 +12,16 @@ function params = paramDefs()
     params.mu  = 0.9;        % friction coefficient
     
     % Operating condition
-    params.vx0 = 15.0;       % m/s
+    % paramDefs
+    params.vxDesign = 20;                                % controller's linearisation point
+    params.vxSim    = 20;                                % plant's actual speed
+    params.xLin = [0; 0; 0; params.vxDesign; 0; 0];
+    params.x0   = [0; 0; 0; params.vxSim;    0; 0];     % m/s
     params.Ts  = 0.05;       % s (sampling period)
 
     % Lateral acceleration
-    params.c_vy = -(params.Cf + params.Cr) / (params.m * params.vx0);
-    params.c_w  =  (params.lr*params.Cr - params.lf*params.Cf) / (params.m * params.vx0);
+    params.c_vy = -(params.Cf + params.Cr) / (params.m * params.vxDesign);
+    params.c_w  =  (params.lr*params.Cr - params.lf*params.Cf) / (params.m * params.vxDesign);
     params.c_d  =  params.Cf / params.m;
 
     % MPC Parameters
@@ -27,6 +31,10 @@ function params = paramDefs()
     params.numSamples = round(params.Tstop/params.Ts);
     params.samples = (1:params.numSamples);
     params.t = (0:params.numSamples-1)' * params.Ts;
+
+    % Linearisation Point
+    params.u0 = [0; 0];
+    params.xNom = @(t) [15*t; 0; 0; 15; 0; 0];
 
     % System Design Constraints
     params.Jlong = 2.0;

@@ -39,6 +39,8 @@ function [xmpc, mpcobj] = mpcObjConstruction(params, plant_d)
     G = [ay_max; ay_max];
 
     setconstraint(mpcobj, E, F, G, [1; 1]);   % [1;1] makes both rows soft
+    setoutdist(mpcobj, 'model', tf(zeros(6,1)));   % no disturbance integrators on the 4 MOs
+    setEstimator(mpcobj, 'custom');                % mpcmove uses xmpc.Plant as given
     xmpc = mpcstate(mpcobj);            % get handle to controller state
 
 end
