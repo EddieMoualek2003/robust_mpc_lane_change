@@ -1,4 +1,5 @@
-function [f_sym, g_sym, x_sym, u_sym] = dynamic_bicycle(params)
+function [s_sym, ] = dynamic_bicycle(params)
+    
     % Define symbolic states
     syms pos_x pos_y psi_angle vx vy omega real
     % Define symbolic inputs
@@ -25,6 +26,9 @@ function [f_sym, g_sym, x_sym, u_sym] = dynamic_bicycle(params)
     Fyf = Cf * alpha_f;
     Fyr = Cr * alpha_r;
 
+    % Lateral acceleration felt by the passenger (inertial frame, body y-axis)
+    ay_sym = (Fyf + Fyr) / m;
+
     % Symbolic state derivative vector f(x, u)
     f_sym = sym(zeros(6, 1));
     f_sym(1) = vx * cos(psi_angle) - vy * sin(psi_angle);            % d(px)/dt
@@ -42,4 +46,7 @@ function [f_sym, g_sym, x_sym, u_sym] = dynamic_bicycle(params)
     g_sym(4) = vx;
     g_sym(5) = vy;                 % new: lateral velocity (for the a_y constraint)
     g_sym(6) = omega;              % new: yaw rate (for the a_y constraint)
+
+    s_sym.f = f_sym; s_sym.g = g_sym; 
+    s_sym.x = x_sym; s_sym.u = u_sym; s_sym.ay = ay_sym;
 end

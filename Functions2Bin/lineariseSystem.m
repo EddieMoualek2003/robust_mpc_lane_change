@@ -1,4 +1,4 @@
-function [linearisedSystem,plant_d, params] = lineariseSystem(params, f_sym, g_sym, x_sym, u_sym, x0, u0)
+function [linearisedSystem, plant_d, params] = lineariseSystem(params, f_sym, g_sym, x_sym, u_sym)
     
     %% Linearise the system and evaluate at the operating point
     Ac_sym = jacobian(f_sym, x_sym);
@@ -7,10 +7,10 @@ function [linearisedSystem,plant_d, params] = lineariseSystem(params, f_sym, g_s
     Dc_sym = jacobian(g_sym, u_sym);
 
     % Substitute variables and convert symbolic objects to numeric doubles
-    Ac = double(subs(Ac_sym, [x_sym; u_sym], [x0; u0]));
-    Bc = double(subs(Bc_sym, [x_sym; u_sym], [x0; u0]));
-    Cc = double(subs(Cc_sym, [x_sym; u_sym], [x0; u0]));
-    Dc = double(subs(Dc_sym, [x_sym; u_sym], [x0; u0]));
+    Ac = double(subs(Ac_sym, [x_sym; u_sym], [params.xLin; params.u0]));
+    Bc = double(subs(Bc_sym, [x_sym; u_sym], [params.xLin; params.u0]));
+    Cc = double(subs(Cc_sym, [x_sym; u_sym], [params.xLin; params.u0]));
+    Dc = double(subs(Dc_sym, [x_sym; u_sym], [params.xLin; params.u0]));
 
     %% Form the state-space model, along with the discrete variant
     plant_c = ss(Ac, Bc, Cc, Dc);
@@ -32,7 +32,7 @@ function [linearisedSystem,plant_d, params] = lineariseSystem(params, f_sym, g_s
     [linearisedSystem.Ad,linearisedSystem.Bd,linearisedSystem.Cd,linearisedSystem.Dd] = ssdata(plant_d);            % must be the same Ts as mpcobj
     
     params.fNum = matlabFunction(f_sym, 'Vars',{x_sym, u_sym});
-    [params.xNomFun, ~] = computeNominal(params.fNum, params.x0, params.u0, params.t);
+    [params.xNomFun, ~] = computeNominal(params.fNum, params.xLin, params.u0, params.t);
 
     params.gNum = matlabFunction(g_sym, 'Vars',{x_sym, u_sym});
     params.yNomFun = @(t) params.gNum(params.xNomFun(t), params.u0);
