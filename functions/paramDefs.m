@@ -1,4 +1,7 @@
-function params = paramDefs()
+function params = paramDefs(o)
+    arguments
+        o.vxSim (1,1) double {mustBePositive} = 20   % m/s, plant's actual speed
+    end
 % Vehicle inertia and geometry
     params.m   = 1500;       % kg
     params.Iz  = 2250;       % kg*m^2
@@ -10,7 +13,7 @@ function params = paramDefs()
     params.mu  = 0.9;        % friction coefficient
 % Operating conditions
     params.vxDesign = 15;                               % m/s, LTI controller's operating point
-    params.vxSim    = 20;                               % m/s, plant's actual speed
+    params.vxSim    = o.vxSim;                              % m/s, plant's actual speed
     params.xLin = [0; 0; 0; params.vxDesign; 0; 0];     % LTI operating point (state)
     params.uLin = [0; 0];                               % LTI operating point (input)
     params.x0   = [0; 0; 0; params.vxSim;    0; 0];     % plant initial state
